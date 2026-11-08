@@ -26,7 +26,7 @@ function routerById(int $id): ?array {
  * Read only PPPoE data from a router. One API connection per router.
  * No interface, traffic, ping, CPU or health calls are made here.
  */
-function pppoeSnapshot(array $r): array {
+function pppoeSnapshot(array $r, bool $details=false): array {
     $api = new RouterOSAPI(
         (string)$r['host'],
         (int)$r['port'],
@@ -45,6 +45,19 @@ function pppoeSnapshot(array $r): array {
             if ($name !== '') $activeNames[$name] = true;
         }
 
+        $detailsByName = [];
+        if ($details) {
+            foreach ($secretRows as $secret) {
+                $name = trim((string)($secret['name'] ?? ''));
+                if ($name === '') continue;
+                $detailsByName[$name] = [
+                    'profile' => (string)($secret['profile'] ?? ''),
+                    'disabled' => ($secret['disabled'] ?? 'false') === 'true',
+                    'comment' => (string)($secret['comment'] ?? ''),
+                    'last_logged_out' => (string)($secret['last-logged-out'] ?? $secret['last-logged-out-time'] ?? $secret['last-logged-out-at'] ?? ''),
+                ];
+            }
+        }
         $active=[];
         foreach ($activeRows as $a) {
             $active[] = [
@@ -58,6 +71,14 @@ function pppoeSnapshot(array $r): array {
                 'encoding'=>(string)($a['encoding'] ?? ''),
                 'profile'=>(string)($a['profile'] ?? ''),
             ];
+            if ($details && !in_array($a['radius'] ?? false, [true, 1, 'true', 'yes'], true)) {
+                $account = $detailsByName[trim((string)($a['name'] ?? ''))] ?? [];
+                $index = array_key_last($active);
+                if ($active[$index]['profile'] === '') {
+                    $active[$index]['profile'] = $account['profile'] ?? '';
+                }
+                $active[$index] += $account;
+            }
         }
 
         $inactive=[];
