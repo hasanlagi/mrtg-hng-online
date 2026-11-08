@@ -1,0 +1,12 @@
+/config/*.local.php
+/config/router-db.php
+/config/history.json
+/runtime/pdf/vendor/
+.env
+.env.*
+*.log
+*.rar
+*.zip
+*.tar.gz
+*.sql.gz
+*.dump

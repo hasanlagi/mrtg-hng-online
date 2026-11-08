@@ -1,0 +1,12 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const scope={window:{}};vm.runInNewContext(fs.readFileSync(__dirname+'/../history-range.js','utf8'),scope);
+const H=scope.window.HngHistory;
+assert.equal(typeof H.chartPoints,'function','Chart preparation must preserve real observations without empty-bin breaks');
+const points=[{ts:0,samples:0,gap:false,a:null},{ts:5,samples:1,gap:false,a:10},{ts:10,samples:0,gap:false,a:null},{ts:15,samples:1,gap:false,a:20},{ts:20,samples:0,gap:true,a:null},{ts:25,samples:2,unknowns:1,gap:false,a:99},{ts:30,samples:1,losses:1,gap:false,a:null}];
+const selected=H.chartPoints(points);
+assert.deepEqual(Array.from(selected,p=>p.ts),[5,15,20,25,30],'Only empty unflagged bins may be skipped; source gaps/timeouts stay');
+assert.equal(selected[0].a,10,'Observed values must not be interpolated');
+assert.equal(selected[1].a,20,'Observed values must be retained');
+assert.equal(H.pointValue(points[5],60),null,'Unknown source must remain a graph break');
+assert.equal(H.pointValue(points[5],31536000),99,'Long averages may retain actual available samples');
+console.log('PASS 6 chart-point preparation checks');

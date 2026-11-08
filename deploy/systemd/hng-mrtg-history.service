@@ -1,0 +1,21 @@
+[Unit]
+Description=HNG MRTG persistent ping history from MikroTik
+After=network-online.target mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/mrtg
+ExecStart=/usr/bin/php /var/www/mrtg/bin/collect-history.php
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/php/sessions
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,7 @@
+<?php
+declare(strict_types=1);
+
+const DB_HOST = 'localhost';
+const DB_NAME = 'mikrotik_monitor';
+const DB_USER = 'mrtg_router_app';
+const DB_PASS = 'GANTI_DENGAN_PASSWORD_DATABASE';

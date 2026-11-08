@@ -1,0 +1,7 @@
+{
+    "host": "localhost",
+    "user": "mrtg_history_app",
+    "password": "GANTI_DENGAN_PASSWORD_DATABASE",
+    "database": "mrtg_history",
+    "secret": "GANTI_DENGAN_NILAI_ACAK_UNIK"
+}
